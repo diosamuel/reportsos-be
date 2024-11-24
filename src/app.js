@@ -7,10 +7,11 @@ require("dotenv").config();
 const middlewares = require("./middlewares");
 const api = require("./api");
 const app = express();
+const path = require("path");
 app.use(morgan("dev"));
 app.use(helmet());
-app.use(cors());
 app.use(express.json());
+// app.use(cors());
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -38,6 +39,9 @@ app.get("/", (req, res) => {
     message: "API OK",
   });
 });
+
+const imagesDirectory = path.join(__dirname, 'api','compute','uploads');
+app.use('/', express.static(imagesDirectory));
 
 app.use("/api/v1", api);
 

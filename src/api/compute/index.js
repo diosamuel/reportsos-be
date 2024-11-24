@@ -2,25 +2,21 @@ const { AssemblyAI } = require("assemblyai");
 const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
-// const { writeFileSync } = require("fs");
-// // Construct the path to the file
-// const TEST_AUD = path.join(
-//   __dirname,
-//   "uploads",
-//   "audio-1732202775245-537811102.mp3"
-// );
-
-// const TEST_GEO = [38.89755337788813, -77.03655064697888];
 async function GetOverpass(geo) {
-  //radius 5 km
-  let SW = geo.map((latlong) => latlong - 0.05);
-  let NE = geo.map((latlong) => latlong + 0.05);
-  let SWNE = [SW, NE];
-
+  let distanceInKm = 5;
+  let [lat, lon] = geo;
+  const latDegreeToKm = 111;
+  const lonDegreeToKm = 111 * Math.cos((lat * Math.PI) / 180);
+  const latOffset = distanceInKm / latDegreeToKm;
+  const lonOffset = distanceInKm / lonDegreeToKm;
+  const south = Number(lat) - latOffset;
+  const north = Number(lat) + latOffset;
+  const west = Number(lon) - lonOffset;
+  const east = Number(lon) + lonOffset;
+  let SWNE = [south, west, north, east];
   let overpassQuery = `[out:json][timeout:25];
   nwr["amenity"~"^(hospital|fire_station|police)$"](${SWNE.join(",")});
   out geom;`;
-
   let result = await fetch("https://overpass-api.de/api/interpreter", {
     method: "POST",
     body: "data=" + encodeURIComponent(overpassQuery),
@@ -29,6 +25,7 @@ async function GetOverpass(geo) {
   let res = await result.json();
   return res;
 }
+
 async function GetNominatim(geo) {
   let [lat, long] = geo;
   let result = await fetch(
