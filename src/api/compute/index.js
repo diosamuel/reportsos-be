@@ -38,26 +38,27 @@ async function GetNominatim(geo) {
   return res;
 }
 
-async function AudioAnalyze(filePath) {
-  const client = new AssemblyAI({
-    apiKey: process.env.APIKEY,
-  });
-  const FILE_URL = filePath;
-  const audioAssemblyData = {
-    audio: FILE_URL,
-    speech_model: "best",
-    iab_categories: true,
-    entity_detection: true,
-    language_detection: true,
-  };
-  const transcript = await client.transcripts.transcribe(audioAssemblyData);
-  delete transcript["words"];
-  // let transcript = { id: "cd867ab6-e387-47b4-8bf9-72a29c28f6c3" };
-  const { response } = await client.lemur.summary({
-    transcript_ids: [transcript.id],
-    final_model: "anthropic/claude-3-haiku",
-    context: "This is an emergency call for assistance.",
-    answer_format: `{
+async function AudioAnalyze(filePath, apikey) {
+  try {
+    const client = new AssemblyAI({
+      apiKey: process.env.APIKEY || apikey,
+    });
+    const FILE_URL = filePath;
+    const audioAssemblyData = {
+      audio: FILE_URL,
+      speech_model: "best",
+      iab_categories: true,
+      entity_detection: true,
+      language_detection: true,
+    };
+    const transcript = await client.transcripts.transcribe(audioAssemblyData);
+    delete transcript["words"];
+    // let transcript = { id: "cd867ab6-e387-47b4-8bf9-72a29c28f6c3" };
+    const { response } = await client.lemur.summary({
+      transcript_ids: [transcript.id],
+      final_model: "anthropic/claude-3-haiku",
+      context: "This is an emergency call for assistance.",
+      answer_format: `{
                     "activities":"very short sentence",
                     "summary: "",
                     "key_points": [],
@@ -65,12 +66,16 @@ async function AudioAnalyze(filePath) {
                     "casualty":"",
                     "status":"Critical"|"Urgent"|"Non-Urgent"
                 }`,
-  });
+    });
 
-  return {
-    transcribe: transcript,
-    llm: response,
-  };
+    return {
+      transcribe: transcript,
+      llm: response,
+    };
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
 }
 
 module.exports = {

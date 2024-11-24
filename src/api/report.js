@@ -20,16 +20,17 @@ router.get("/:id", async (req, res) => {
     let response = await retrieveData(req.params.id);
     let { geolocation, audio, image, status, summary, title, datetime } =
       response[0];
-
+    const API_KEY = req.query.API_KEY;
     if (summary) {
       console.log(req.params.id, "EXISTS!");
       res.json(JSON.parse(summary));
     } else {
       let geoRes = JSON.parse(geolocation);
       let nominatimRes = await GetNominatim(geoRes);
-      let overpassRes = await GetOverpass(geoRes);
+      // let overpassRes = await GetOverpass(geoRes);
       let assemblyaiRes = await AudioAnalyze(
-        `./src/api/compute/uploads/${audio}`
+        `./src/api/compute/uploads/${audio}`,
+        API_KEY
       );
 
       let result = {
@@ -82,7 +83,6 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      console.log(req.files);
       const coordinate = req.body?.coordinate;
       const audioFile = req.files.audio ? req.files.audio[0] : null;
       const imageFile = req.files.image ? req.files.image[0] : null;
@@ -101,7 +101,7 @@ router.post(
           message: "Success",
           data: result[0],
         });
-      }else{
+      } else {
         res.json({
           status: 200,
           message: "Error, please add coordinate",
