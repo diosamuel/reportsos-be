@@ -18,10 +18,11 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     let response = await retrieveData(req.params.id);
-    let { geolocation, audio, image, status, summary, title,datetime } = response[0];
+    let { geolocation, audio, image, status, summary, title, datetime } =
+      response[0];
 
     if (summary) {
-      console.log(req.params.id,"EXISTS!")
+      console.log(req.params.id, "EXISTS!");
       res.json(JSON.parse(summary));
     } else {
       let geoRes = JSON.parse(geolocation);
@@ -36,7 +37,7 @@ router.get("/:id", async (req, res) => {
         message: "Success",
         image,
         audio,
-        emergencyStatus:status,
+        emergencyStatus: status,
         datetime,
         data: {
           nominatim: nominatimRes,
@@ -47,9 +48,9 @@ router.get("/:id", async (req, res) => {
         id: req.params.id,
         data: JSON.stringify(result),
       }).catch((err) => {
-          console.log(err);
-          throw new Error(err)
-        });
+        console.log(err);
+        throw new Error(err);
+      });
 
       res.json(result);
     }
@@ -81,24 +82,34 @@ router.post(
   ]),
   async (req, res) => {
     try {
-      const { coordinate } = req.body;
+      console.log(req.files);
+      const coordinate = req.body?.coordinate;
       const audioFile = req.files.audio ? req.files.audio[0] : null;
       const imageFile = req.files.image ? req.files.image[0] : null;
-      let { display_name } = await GetNominatim(JSON.parse(coordinate));
-      let data = {
-        geolocation: coordinate,
-        imageUrl: imageFile?.filename,
-        audioUrl: audioFile?.filename,
-        title: display_name,
-      };
-      let result = await insertData(data);
+      if (coordinate) {
+        let { display_name } = await GetNominatim(JSON.parse(coordinate));
+        let data = {
+          geolocation: coordinate,
+          imageUrl: imageFile?.filename,
+          audioUrl: audioFile?.filename,
+          title: display_name,
+        };
+        let result = await insertData(data);
 
-      res.json({
-        status: 200,
-        message: "Success",
-        data: result[0],
-      });
+        res.json({
+          status: 200,
+          message: "Success",
+          data: result[0],
+        });
+      }else{
+        res.json({
+          status: 200,
+          message: "Error, please add coordinate",
+          data: null,
+        });
+      }
     } catch (error) {
+      console.log(error);
       res.status(400).json({ error: error.message });
     }
   }

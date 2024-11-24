@@ -59,11 +59,11 @@ async function AudioAnalyze(filePath){
     final_model: "anthropic/claude-3-haiku",
     context: "This is an emergency call for assistance.",
     answer_format: `{
-                    "activities":"",
+                    "activities":"very short sentence",
                     "summary: "",
                     "key_points": [],
                     "tone": "",
-                    "context":"",
+                    "casualty":"",
                     "status":'Critical'|'Urgent'|'Non-Urgent'
                 }`,
   });
