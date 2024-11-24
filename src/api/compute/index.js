@@ -1,7 +1,7 @@
 const { AssemblyAI } = require("assemblyai");
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config()
+require("dotenv").config();
 // const { writeFileSync } = require("fs");
 // // Construct the path to the file
 // const TEST_AUD = path.join(
@@ -24,22 +24,24 @@ async function GetOverpass(geo) {
   let result = await fetch("https://overpass-api.de/api/interpreter", {
     method: "POST",
     body: "data=" + encodeURIComponent(overpassQuery),
-  })
+  });
 
-  let res = await result.json()
-  return res
+  let res = await result.json();
+  return res;
 }
-async function GetNominatim(geo){
-  let [lat,long] = geo
-  let result = await fetch(`https://nominatim.openstreetmap.org/reverse.php?lat=${lat}&lon=${long}&zoom=18&format=jsonv2`,{
-    method:"GET"
-  })
-  let res = await result.json()
-  return res
+async function GetNominatim(geo) {
+  let [lat, long] = geo;
+  let result = await fetch(
+    `https://nominatim.openstreetmap.org/reverse.php?lat=${lat}&lon=${long}&zoom=18&format=jsonv2`,
+    {
+      method: "GET",
+    }
+  );
+  let res = await result.json();
+  return res;
 }
 
-
-async function AudioAnalyze(filePath){
+async function AudioAnalyze(filePath) {
   const client = new AssemblyAI({
     apiKey: process.env.APIKEY,
   });
@@ -52,7 +54,7 @@ async function AudioAnalyze(filePath){
     language_detection: true,
   };
   const transcript = await client.transcripts.transcribe(audioAssemblyData);
-  delete transcript["words"]
+  delete transcript["words"];
   // let transcript = { id: "cd867ab6-e387-47b4-8bf9-72a29c28f6c3" };
   const { response } = await client.lemur.summary({
     transcript_ids: [transcript.id],
@@ -64,19 +66,18 @@ async function AudioAnalyze(filePath){
                     "key_points": [],
                     "tone": "",
                     "casualty":"",
-                    "status":'Critical'|'Urgent'|'Non-Urgent'
+                    "status":"Critical"|"Urgent"|"Non-Urgent"
                 }`,
   });
 
-  return({
-    transcribe:transcript,
-    llm:response
-  });
-};
+  return {
+    transcribe: transcript,
+    llm: response,
+  };
+}
 
-
-module.exports={
+module.exports = {
   GetNominatim,
   GetOverpass,
-  AudioAnalyze
-}
+  AudioAnalyze,
+};
