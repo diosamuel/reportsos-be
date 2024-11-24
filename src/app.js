@@ -9,9 +9,16 @@ const api = require("./api");
 const app = express();
 const path = require("path");
 app.use(morgan("dev"));
-app.use(helmet());
 app.use(express.json());
-// app.use(cors());
+app.use(cors());
+
+app.use(
+  helmet({
+    crossOriginEmbedderPolicy: false, // Disable COEP
+    // Add other configurations as needed
+  })
+);
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
