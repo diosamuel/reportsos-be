@@ -1,8 +1,6 @@
 const { neon } = require("@neondatabase/serverless");
-
-const sql = neon(
-  "postgresql://reportsos_owner:AIp5JzO2HrgY@ep-wild-meadow-a57cbyy0.us-east-2.aws.neon.tech/reportsos?sslmode=require"
-);
+require("dotenv").config()
+const sql = neon(process.env.DATABASE_URL);
 
 // Sample data for insertion
 const geolocation = [40.712776, -74.005974]; // Example: Latitude, Longitude
