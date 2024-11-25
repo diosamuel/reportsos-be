@@ -60,7 +60,7 @@ async function AudioAnalyze(filePath, apikey) {
       context: "This is an emergency call for assistance.",
       answer_format: `{
                     "activities":"very short sentence",
-                    "summary: "",
+                    "summary": "",
                     "key_points": [],
                     "tone": "",
                     "casualty":"",
